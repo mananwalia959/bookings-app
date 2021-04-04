@@ -5,13 +5,20 @@ import (
 	"html/template"
 	"net/http"
 	"path/filepath"
+
+	"github.com/mananwalia959/bookings-app/pkg/config"
 )
 
+var app *config.AppConfig
 var functions = template.FuncMap{}
+
+func AddAppConfig(a *config.AppConfig) {
+	app = a
+}
 
 func RenderTemplate(w http.ResponseWriter, tmpl string) {
 
-	templateCache, _ := BuildTemplateCache()
+	templateCache := app.TemplateCache
 
 	parsedTemplate, isTemplateInCache := templateCache[tmpl]
 	if !isTemplateInCache {

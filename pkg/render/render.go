@@ -17,8 +17,16 @@ func AddAppConfig(a *config.AppConfig) {
 }
 
 func RenderTemplate(w http.ResponseWriter, tmpl string) {
-
-	templateCache := app.TemplateCache
+	var templateCache map[string]*template.Template
+	if app.UseCache {
+		templateCache = app.TemplateCache
+	} else {
+		t, err := BuildTemplateCache()
+		templateCache = t
+		if err != nil {
+			fmt.Println(err.Error())
+		}
+	}
 
 	parsedTemplate, isTemplateInCache := templateCache[tmpl]
 	if !isTemplateInCache {

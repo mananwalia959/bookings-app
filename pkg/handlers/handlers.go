@@ -3,12 +3,29 @@ package handlers
 import (
 	"net/http"
 
+	"github.com/mananwalia959/bookings-app/pkg/config"
 	"github.com/mananwalia959/bookings-app/pkg/render"
 )
 
-func Home(w http.ResponseWriter, r *http.Request) {
+var Repo *Repository
+
+type Repository struct {
+	App *config.AppConfig
+}
+
+func NewRepo(a *config.AppConfig) *Repository {
+	return &Repository{
+		App: a,
+	}
+}
+
+func SetRepo(r *Repository) {
+	Repo = r
+}
+
+func (repo *Repository) Home(w http.ResponseWriter, r *http.Request) {
 	render.RenderTemplate(w, "home.page.tmpl")
 }
-func About(w http.ResponseWriter, r *http.Request) {
+func (repo *Repository) About(w http.ResponseWriter, r *http.Request) {
 	render.RenderTemplate(w, "about.page.tmpl")
 }

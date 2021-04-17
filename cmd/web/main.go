@@ -13,16 +13,21 @@ import (
 var portnumber = ":8080"
 
 func main() {
-	var config config.AppConfig
+	var app config.AppConfig
 	tc, err := render.BuildTemplateCache()
 	if err != nil {
 		log.Fatal("Unable to load Cache")
 	}
 
-	config.TemplateCache = tc
+	app.TemplateCache = tc
+	app.UseCache = false
+	repo := handlers.NewRepo(&app)
 
-	http.HandleFunc("/", handlers.Home)
-	http.HandleFunc("/about", handlers.About)
+	handlers.SetRepo(repo)
+	render.AddAppConfig(&app)
+
+	http.HandleFunc("/", handlers.Repo.Home)
+	http.HandleFunc("/about", handlers.Repo.About)
 
 	fmt.Printf("Application Started on Port %s ", portnumber)
 

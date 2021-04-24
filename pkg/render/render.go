@@ -1,12 +1,14 @@
 package render
 
 import (
+	"bytes"
 	"fmt"
 	"html/template"
 	"net/http"
 	"path/filepath"
 
 	"github.com/mananwalia959/bookings-app/pkg/config"
+	"github.com/mananwalia959/bookings-app/pkg/models"
 )
 
 var app *config.AppConfig
@@ -16,26 +18,31 @@ func AddAppConfig(a *config.AppConfig) {
 	app = a
 }
 
-func RenderTemplate(w http.ResponseWriter, tmpl string) {
-	var templateCache map[string]*template.Template
+func RenderTemplate(w http.ResponseWriter, tmpl string, td *models.TemplateData) {
+	var tc map[string]*template.Template
 	if app.UseCache {
-		templateCache = app.TemplateCache
+		tc = app.TemplateCache
 	} else {
 		t, err := BuildTemplateCache()
-		templateCache = t
+		tc = t
 		if err != nil {
-			fmt.Println(err.Error())
+			fmt.Println("Can't build Template Cache", err)
 		}
 	}
 
-	parsedTemplate, isTemplateInCache := templateCache[tmpl]
+	parsedTemplate, isTemplateInCache := tc[tmpl]
 	if !isTemplateInCache {
 		fmt.Println("Template not in Cache")
 		return
 	}
 
-	err := parsedTemplate.Execute(w, nil)
+	buf := new(bytes.Buffer)
 
+	err := parsedTemplate.ExecuteTemplate(buf, "base", td)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	_, err = buf.WriteTo(w)
 	if err != nil {
 		fmt.Println(err.Error())
 	}

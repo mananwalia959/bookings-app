@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/mananwalia959/bookings-app/pkg/config"
+	"github.com/mananwalia959/bookings-app/pkg/models"
 	"github.com/mananwalia959/bookings-app/pkg/render"
 )
 
@@ -24,8 +25,14 @@ func SetRepo(r *Repository) {
 }
 
 func (repo *Repository) Home(w http.ResponseWriter, r *http.Request) {
-	render.RenderTemplate(w, "home.page.tmpl")
+
+	render.RenderTemplate(w, "home.page.tmpl", &models.TemplateData{})
 }
 func (repo *Repository) About(w http.ResponseWriter, r *http.Request) {
-	render.RenderTemplate(w, "about.page.tmpl")
+	values := make(map[string]interface{})
+	values["message"] = "Hello There"
+
+	render.RenderTemplate(w, "about.page.tmpl", &models.TemplateData{
+		Values: values,
+	})
 }

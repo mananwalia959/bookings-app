@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"time"
 
+	"github.com/alexedwards/scs/v2"
 	"github.com/mananwalia959/bookings-app/pkg/config"
 	"github.com/mananwalia959/bookings-app/pkg/handlers"
 	"github.com/mananwalia959/bookings-app/pkg/render"
@@ -15,6 +17,17 @@ var portnumber = ":8080"
 
 func main() {
 	var app config.AppConfig
+	app.UseTls = false
+
+	sessionManager := scs.New()
+
+	sessionManager.Lifetime = 24 * time.Hour
+	sessionManager.Cookie.Persist = true
+	sessionManager.Cookie.SameSite = http.SameSiteLaxMode
+	sessionManager.Cookie.Secure = app.UseTls
+
+	app.SessionManager = sessionManager
+
 	tc, err := render.BuildTemplateCache()
 	if err != nil {
 		log.Fatal("Unable to load Cache")
@@ -28,8 +41,6 @@ func main() {
 	render.AddAppConfig(&app)
 
 	fmt.Println(fmt.Sprintf("Application Started on Port %s ", portnumber))
-
-	// _ = http.ListenAndServe(portnumber, routes)
 
 	srv := &http.Server{
 		Addr:    portnumber,

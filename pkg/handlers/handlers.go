@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/mananwalia959/bookings-app/pkg/config"
@@ -25,12 +26,16 @@ func SetRepo(r *Repository) {
 }
 
 func (repo *Repository) Home(w http.ResponseWriter, r *http.Request) {
+	repo.App.SessionManager.Put(r.Context(), "example", "example")
 
 	render.RenderTemplate(w, "home.page.tmpl", &models.TemplateData{})
 }
 func (repo *Repository) About(w http.ResponseWriter, r *http.Request) {
 	values := make(map[string]interface{})
 	values["message"] = "Hello There"
+
+	val := repo.App.SessionManager.Get(r.Context(), "example")
+	fmt.Println(val)
 
 	render.RenderTemplate(w, "about.page.tmpl", &models.TemplateData{
 		Values: values,
